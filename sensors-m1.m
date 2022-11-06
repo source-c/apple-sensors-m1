@@ -169,40 +169,35 @@ int main(int argc, char* argv[])
     //    kHIDUsage_AppleVendorPowerSensor_Voltage    = 0x0003,
     //  ------------------------------
 
-    NSDictionary* currentSensors = matching(0xff08, 0x0002);
-    NSDictionary* voltageSensors = matching(0xff08, 0x0003);
-    NSDictionary* thermalSensors = matching(0xff00, 0x0005);
-
-    NSArray* currentNames = getProductNames(currentSensors);
-    NSArray* voltageNames = getProductNames(voltageSensors);
-    NSArray* thermalNames = getProductNames(thermalSensors);
-
-    NSArray* currentValues = getPowerValues(currentSensors);
-    NSArray* voltageValues = getPowerValues(voltageSensors);
-    NSArray* thermalValues = getThermalValues(thermalSensors);
-
-    NSArray* sortedCurrent = sortKeyValuePairs(currentNames, currentValues);
-    NSArray* sortedVoltage = sortKeyValuePairs(voltageNames, voltageValues);
-    NSArray* sortedThermal = sortKeyValuePairs(thermalNames, thermalValues);
-
     if (!show_voltage && !show_current && !show_temperature) {
         usage();
         return 0;
     }
 
     if (show_voltage) {
+        NSDictionary* voltageSensors = matching(0xff08, 0x0003);
+        NSArray* voltageNames = getProductNames(voltageSensors);
+        NSArray* voltageValues = getPowerValues(voltageSensors);
+        NSArray* sortedVoltage = sortKeyValuePairs(voltageNames, voltageValues);
         dumpPairs(sortedVoltage, @"V");
+        CFRelease(voltageValues);
     }
     if (show_current) {
+        NSDictionary* currentSensors = matching(0xff08, 0x0002);
+        NSArray* currentNames = getProductNames(currentSensors);
+        NSArray* currentValues = getPowerValues(currentSensors);
+        NSArray* sortedCurrent = sortKeyValuePairs(currentNames, currentValues);
         dumpPairs(sortedCurrent, @"A");
+        CFRelease(currentValues);
     }
     if (show_temperature) {
+        NSDictionary* thermalSensors = matching(0xff00, 0x0005);
+        NSArray* thermalNames = getProductNames(thermalSensors);
+        NSArray* thermalValues = getThermalValues(thermalSensors);
+        NSArray* sortedThermal = sortKeyValuePairs(thermalNames, thermalValues);
         dumpPairs(sortedThermal, @"°C");
+        CFRelease(thermalValues);
     }
-
-    CFRelease(currentValues);
-    CFRelease(voltageValues);
-    CFRelease(thermalValues);
 
     printf("\n");
     
